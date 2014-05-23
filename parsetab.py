@@ -5,9 +5,9 @@ _tabversion = '3.2'
 
 _lr_method = 'LALR'
 
-_lr_signature = '&)\xc9\tK\xb0\xd8\xd3V0\xa4\xdbD\xbb\xbb\xc4'
+_lr_signature = '\xfe\xa6\x8a=C\xd4V\x93ImM\\\xe9\x8c\x82\xf3'
     
-_lr_action_items = {'ID':([2,4,],[3,6,]),'LBRACE':([3,],[4,]),'CLASS':([0,],[2,]),'RBRACE':([5,6,],[7,-2,]),'$end':([1,7,],[0,-1,]),}
+_lr_action_items = {'LBRACE':([3,14,23,27,],[4,-16,26,30,]),'RPAREN':([14,18,19,20,21,25,28,],[-16,-12,23,-13,-11,-15,-14,]),'RBRACE':([4,5,6,8,9,10,11,17,26,29,30,31,],[-5,7,-2,-3,-7,-4,-8,-6,29,-10,31,-9,]),'SEMICOLON':([14,15,],[-16,17,]),'INT':([12,22,23,],[14,14,14,]),'CLASS':([0,],[2,]),'COMMA':([14,20,21,25,28,],[-16,-13,24,-15,-14,]),'LPAREN':([16,],[18,]),'ID':([2,4,6,8,9,10,11,13,17,18,24,29,31,],[3,-5,12,-3,-7,-4,-8,16,-6,22,22,-10,-9,]),'DEF':([4,6,8,9,10,11,17,29,31,],[-5,13,-3,-7,-4,-8,-6,-10,-9,]),'$end':([1,7,],[0,-1,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'program':([0,],[1,]),'classdef':([4,],[5,]),}
+_lr_goto_items = {'function':([6,],[8,]),'functionWithReturnType':([6,],[9,]),'arg':([18,24,],[20,28,]),'classdef':([4,],[5,]),'globalVar':([6,],[10,]),'program':([0,],[1,]),'varType':([12,22,23,],[15,25,27,]),'arguments':([18,],[19,]),'functionWithoutReturnType':([6,],[11,]),'argList':([18,],[21,]),'functionOrVarList':([4,],[6,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -26,6 +26,20 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> program","S'",1,None,None,None),
-  ('program -> CLASS ID LBRACE classdef RBRACE','program',5,'p_program','langyacc.py',7),
-  ('classdef -> ID','classdef',1,'p_classdef','langyacc.py',10),
+  ('program -> CLASS ID LBRACE classdef RBRACE','program',5,'p_program','./langyacc.py',8),
+  ('classdef -> functionOrVarList','classdef',1,'p_classdef','./langyacc.py',11),
+  ('functionOrVarList -> functionOrVarList function','functionOrVarList',2,'p_functionOrVarList','./langyacc.py',14),
+  ('functionOrVarList -> functionOrVarList globalVar','functionOrVarList',2,'p_functionOrVarList','./langyacc.py',15),
+  ('functionOrVarList -> <empty>','functionOrVarList',0,'p_functionOrVarList','./langyacc.py',16),
+  ('globalVar -> ID varType SEMICOLON','globalVar',3,'p_globalVar','./langyacc.py',20),
+  ('function -> functionWithReturnType','function',1,'p_function','./langyacc.py',25),
+  ('function -> functionWithoutReturnType','function',1,'p_function','./langyacc.py',26),
+  ('functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE','functionWithReturnType',8,'p_functionWithReturnType','./langyacc.py',29),
+  ('functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE RBRACE','functionWithoutReturnType',7,'p_functionWithoutReturnType','./langyacc.py',32),
+  ('arguments -> argList','arguments',1,'p_arguments','./langyacc.py',36),
+  ('arguments -> <empty>','arguments',0,'p_arguments','./langyacc.py',37),
+  ('argList -> arg','argList',1,'p_argList','./langyacc.py',42),
+  ('argList -> argList COMMA arg','argList',3,'p_argList','./langyacc.py',43),
+  ('arg -> ID varType','arg',2,'p_arg','./langyacc.py',46),
+  ('varType -> INT','varType',1,'p_VarType','./langyacc.py',49),
 ]

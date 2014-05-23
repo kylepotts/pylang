@@ -1,30 +1,52 @@
 Created by PLY version 3.4 (http://www.dabeaz.com/ply)
 
-Unused terminals:
-
-    RPAREN
-    LPAREN
-
 Grammar
 
 Rule 0     S' -> program
 Rule 1     program -> CLASS ID LBRACE classdef RBRACE
-Rule 2     classdef -> ID
+Rule 2     classdef -> functionOrVarList
+Rule 3     functionOrVarList -> functionOrVarList function
+Rule 4     functionOrVarList -> functionOrVarList globalVar
+Rule 5     functionOrVarList -> <empty>
+Rule 6     globalVar -> ID varType SEMICOLON
+Rule 7     function -> functionWithReturnType
+Rule 8     function -> functionWithoutReturnType
+Rule 9     functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE
+Rule 10    functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE RBRACE
+Rule 11    arguments -> argList
+Rule 12    arguments -> <empty>
+Rule 13    argList -> arg
+Rule 14    argList -> argList COMMA arg
+Rule 15    arg -> ID varType
+Rule 16    varType -> INT
 
 Terminals, with rules where they appear
 
 CLASS                : 1
-ID                   : 1 2
-LBRACE               : 1
-LPAREN               : 
-RBRACE               : 1
-RPAREN               : 
+COMMA                : 14
+DEF                  : 9 10
+ID                   : 1 6 9 10 15
+INT                  : 16
+LBRACE               : 1 9 10
+LPAREN               : 9 10
+RBRACE               : 1 9 10
+RPAREN               : 9 10
+SEMICOLON            : 6
 error                : 
 
 Nonterminals, with rules where they appear
 
+arg                  : 13 14
+argList              : 11 14
+arguments            : 9 10
 classdef             : 1
+function             : 3
+functionOrVarList    : 2 3 4
+functionWithReturnType : 7
+functionWithoutReturnType : 8
+globalVar            : 4
 program              : 0
+varType              : 6 9 15
 
 Parsing method: LALR
 
@@ -60,11 +82,17 @@ state 3
 state 4
 
     (1) program -> CLASS ID LBRACE . classdef RBRACE
-    (2) classdef -> . ID
+    (2) classdef -> . functionOrVarList
+    (3) functionOrVarList -> . functionOrVarList function
+    (4) functionOrVarList -> . functionOrVarList globalVar
+    (5) functionOrVarList -> .
 
-    ID              shift and go to state 6
+    ID              reduce using rule 5 (functionOrVarList -> .)
+    DEF             reduce using rule 5 (functionOrVarList -> .)
+    RBRACE          reduce using rule 5 (functionOrVarList -> .)
 
     classdef                       shift and go to state 5
+    functionOrVarList              shift and go to state 6
 
 state 5
 
@@ -75,14 +103,240 @@ state 5
 
 state 6
 
-    (2) classdef -> ID .
+    (2) classdef -> functionOrVarList .
+    (3) functionOrVarList -> functionOrVarList . function
+    (4) functionOrVarList -> functionOrVarList . globalVar
+    (7) function -> . functionWithReturnType
+    (8) function -> . functionWithoutReturnType
+    (6) globalVar -> . ID varType SEMICOLON
+    (9) functionWithReturnType -> . DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE
+    (10) functionWithoutReturnType -> . DEF ID LPAREN arguments RPAREN LBRACE RBRACE
 
-    RBRACE          reduce using rule 2 (classdef -> ID .)
+    RBRACE          reduce using rule 2 (classdef -> functionOrVarList .)
+    ID              shift and go to state 12
+    DEF             shift and go to state 13
 
+    function                       shift and go to state 8
+    functionWithReturnType         shift and go to state 9
+    globalVar                      shift and go to state 10
+    functionWithoutReturnType      shift and go to state 11
 
 state 7
 
     (1) program -> CLASS ID LBRACE classdef RBRACE .
 
     $end            reduce using rule 1 (program -> CLASS ID LBRACE classdef RBRACE .)
+
+
+state 8
+
+    (3) functionOrVarList -> functionOrVarList function .
+
+    ID              reduce using rule 3 (functionOrVarList -> functionOrVarList function .)
+    DEF             reduce using rule 3 (functionOrVarList -> functionOrVarList function .)
+    RBRACE          reduce using rule 3 (functionOrVarList -> functionOrVarList function .)
+
+
+state 9
+
+    (7) function -> functionWithReturnType .
+
+    ID              reduce using rule 7 (function -> functionWithReturnType .)
+    DEF             reduce using rule 7 (function -> functionWithReturnType .)
+    RBRACE          reduce using rule 7 (function -> functionWithReturnType .)
+
+
+state 10
+
+    (4) functionOrVarList -> functionOrVarList globalVar .
+
+    ID              reduce using rule 4 (functionOrVarList -> functionOrVarList globalVar .)
+    DEF             reduce using rule 4 (functionOrVarList -> functionOrVarList globalVar .)
+    RBRACE          reduce using rule 4 (functionOrVarList -> functionOrVarList globalVar .)
+
+
+state 11
+
+    (8) function -> functionWithoutReturnType .
+
+    ID              reduce using rule 8 (function -> functionWithoutReturnType .)
+    DEF             reduce using rule 8 (function -> functionWithoutReturnType .)
+    RBRACE          reduce using rule 8 (function -> functionWithoutReturnType .)
+
+
+state 12
+
+    (6) globalVar -> ID . varType SEMICOLON
+    (16) varType -> . INT
+
+    INT             shift and go to state 14
+
+    varType                        shift and go to state 15
+
+state 13
+
+    (9) functionWithReturnType -> DEF . ID LPAREN arguments RPAREN varType LBRACE RBRACE
+    (10) functionWithoutReturnType -> DEF . ID LPAREN arguments RPAREN LBRACE RBRACE
+
+    ID              shift and go to state 16
+
+
+state 14
+
+    (16) varType -> INT .
+
+    SEMICOLON       reduce using rule 16 (varType -> INT .)
+    COMMA           reduce using rule 16 (varType -> INT .)
+    RPAREN          reduce using rule 16 (varType -> INT .)
+    LBRACE          reduce using rule 16 (varType -> INT .)
+
+
+state 15
+
+    (6) globalVar -> ID varType . SEMICOLON
+
+    SEMICOLON       shift and go to state 17
+
+
+state 16
+
+    (9) functionWithReturnType -> DEF ID . LPAREN arguments RPAREN varType LBRACE RBRACE
+    (10) functionWithoutReturnType -> DEF ID . LPAREN arguments RPAREN LBRACE RBRACE
+
+    LPAREN          shift and go to state 18
+
+
+state 17
+
+    (6) globalVar -> ID varType SEMICOLON .
+
+    ID              reduce using rule 6 (globalVar -> ID varType SEMICOLON .)
+    DEF             reduce using rule 6 (globalVar -> ID varType SEMICOLON .)
+    RBRACE          reduce using rule 6 (globalVar -> ID varType SEMICOLON .)
+
+
+state 18
+
+    (9) functionWithReturnType -> DEF ID LPAREN . arguments RPAREN varType LBRACE RBRACE
+    (10) functionWithoutReturnType -> DEF ID LPAREN . arguments RPAREN LBRACE RBRACE
+    (11) arguments -> . argList
+    (12) arguments -> .
+    (13) argList -> . arg
+    (14) argList -> . argList COMMA arg
+    (15) arg -> . ID varType
+
+    RPAREN          reduce using rule 12 (arguments -> .)
+    ID              shift and go to state 22
+
+    argList                        shift and go to state 21
+    arguments                      shift and go to state 19
+    arg                            shift and go to state 20
+
+state 19
+
+    (9) functionWithReturnType -> DEF ID LPAREN arguments . RPAREN varType LBRACE RBRACE
+    (10) functionWithoutReturnType -> DEF ID LPAREN arguments . RPAREN LBRACE RBRACE
+
+    RPAREN          shift and go to state 23
+
+
+state 20
+
+    (13) argList -> arg .
+
+    COMMA           reduce using rule 13 (argList -> arg .)
+    RPAREN          reduce using rule 13 (argList -> arg .)
+
+
+state 21
+
+    (11) arguments -> argList .
+    (14) argList -> argList . COMMA arg
+
+    RPAREN          reduce using rule 11 (arguments -> argList .)
+    COMMA           shift and go to state 24
+
+
+state 22
+
+    (15) arg -> ID . varType
+    (16) varType -> . INT
+
+    INT             shift and go to state 14
+
+    varType                        shift and go to state 25
+
+state 23
+
+    (9) functionWithReturnType -> DEF ID LPAREN arguments RPAREN . varType LBRACE RBRACE
+    (10) functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN . LBRACE RBRACE
+    (16) varType -> . INT
+
+    LBRACE          shift and go to state 26
+    INT             shift and go to state 14
+
+    varType                        shift and go to state 27
+
+state 24
+
+    (14) argList -> argList COMMA . arg
+    (15) arg -> . ID varType
+
+    ID              shift and go to state 22
+
+    arg                            shift and go to state 28
+
+state 25
+
+    (15) arg -> ID varType .
+
+    COMMA           reduce using rule 15 (arg -> ID varType .)
+    RPAREN          reduce using rule 15 (arg -> ID varType .)
+
+
+state 26
+
+    (10) functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE . RBRACE
+
+    RBRACE          shift and go to state 29
+
+
+state 27
+
+    (9) functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType . LBRACE RBRACE
+
+    LBRACE          shift and go to state 30
+
+
+state 28
+
+    (14) argList -> argList COMMA arg .
+
+    COMMA           reduce using rule 14 (argList -> argList COMMA arg .)
+    RPAREN          reduce using rule 14 (argList -> argList COMMA arg .)
+
+
+state 29
+
+    (10) functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE RBRACE .
+
+    ID              reduce using rule 10 (functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE RBRACE .)
+    DEF             reduce using rule 10 (functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE RBRACE .)
+    RBRACE          reduce using rule 10 (functionWithoutReturnType -> DEF ID LPAREN arguments RPAREN LBRACE RBRACE .)
+
+
+state 30
+
+    (9) functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE . RBRACE
+
+    RBRACE          shift and go to state 31
+
+
+state 31
+
+    (9) functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE .
+
+    ID              reduce using rule 9 (functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE .)
+    DEF             reduce using rule 9 (functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE .)
+    RBRACE          reduce using rule 9 (functionWithReturnType -> DEF ID LPAREN arguments RPAREN varType LBRACE RBRACE .)
 
